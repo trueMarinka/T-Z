@@ -10,34 +10,91 @@ import flashx.textLayout.operations.MoveChildrenOperation;
 // Created 25.04.2015 at 0:20
 public class Field extends Sprite{
     private var items:Object = {workshop: {cost:20, income:10, time:5},
-                                 complex: {cost:30, income:20, time:15}};
+                                 complex: {cost:30, income:20, time:15}
+    };
 
-    private var buildings_arr:Array = [];
+    const grid_row:int = 6;
+    const grid_col:int = 6;
+    private var grid:Array = [[], [], [], [], [], []];
+    public var grid_container:MovieClip = new MovieClip();
 
     public function Field() {
-        var container:Graphics = new Graphics("field");
-        container.x = -100;
-        container.y = -50;
-        addChild(container);
-        Add("complex", 123, 203);
-        Add("workshop", 223, 153);
-        Add("workshop", 323, 103);
+        new Graphics("field", this);
+        SetGrid();
+        grid_container.x = 200;
+        grid_container.y = 100;
+        addChild(grid_container);
+
+        Add("complex", 0, 0);
+        Add("workshop", 0, 1);
+        Add("workshop", 0, 2);
+        Add("complex", 1, 0);
+        Add("workshop", 1, 1);
+        Add("workshop", 1, 2);
+        Add("complex", 2, 0);
+        Add("workshop", 2, 1);
+        Add("workshop", 2, 2);
 
 
 
     }
 
-    public function Remove(obj:DisplayObject):void{          // не правильно, надо как-то через массив строений удал€ть
-       removeChild(obj);
+    private  function SetGrid():void{
+        var cell:Cell;
+        for(var i:int = 0; i < grid_row; i++){
+            for(var k:int = 0; k < grid_col; k++){
+                cell = new Cell(i, k);
+                cell.x = k * 100;
+                cell.y = i * 100;
+                grid[i].push(cell);
+                grid_container.addChild(cell);
+            }
+        }
     }
 
-    private function Add(name:String, pos_x:int, pos_y:int):void{
+    public function Remove():void{
+        trace("sell");
+       for(var i:int = 0; i < grid_row; i++){
+           for(var k:int = 0; k < grid_col; k++){
+               if(grid[i][k].highlighting.visible){
+                   if(grid[i][k].numChildren > 1){
+                       Main.instance._coins += grid[i][k].getChildAt(1).cost/2;
+                       Main.instance.gui.money.count.text = Main.instance._coins;
+                       grid[i][k].getChildAt(1).RemoveListeners();
+                       grid[i][k].removeChildAt(1);      // удал€ю здание из €чейки
+                       grid[i][k].getChildAt(0).visible = false; // убираю выделение
+                       return;
+                   }
+               }
+           }
+       }
+    }
+
+    public function get IsSomethingSelected():Boolean{
+        for(var i:int = 0; i < grid_row; i++){
+            for(var k:int = 0; k < grid_col; k++){
+                if(grid[i][k].highlighting.visible){
+                    return true ;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function Add(name:String, row:int, col:int):void{
         var cost:int = items[name].cost;
         var revenue:int = items[name].income;
         var time_for_income:Number = items[name].time;
 
-        buildings_arr.push(new Building(name, pos_x, pos_y, cost, revenue, time_for_income));
-        addChild(buildings_arr[buildings_arr.length-1]);
+        // проверка что место не зан€то
+        if(grid[row][col].numChildren == 1){
+            grid[row][col].addChild(new Building(name, cost, revenue, time_for_income));
+        }
     }
+
+    public function add_graphics(graphics:MovieClip):void {
+        addChildAt(graphics, 0);
+    }
+
 }
 }
