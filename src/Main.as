@@ -6,7 +6,8 @@ import flash.net.SharedObject;
 
 [SWF(width="800",height="480",frameRate="30")]
 public class Main extends Sprite {
-    public var shared:SharedObject;
+    public var saver:SharedObject;
+    public var id:int;
     private static var _instance:Main;
     public var field:Field;
     public var gui:Gui;
@@ -23,17 +24,29 @@ public class Main extends Sprite {
         return _instance;
     }
 
-    public var _coins:int = 0;
+    public var _coins:int;
 
     public function Main() {
+        saver = SharedObject.getLocal("Data");
+        //saver.clear();
+        if(!saver.data.coins){                      // если первый запуск
+            _coins = 1000;
+            saver.data.coins = _coins;
+            saver.data.field = {};
+            id = 1;
+        }
+        else{
+            _coins = saver.data.coins;
+        }
         _instance = this;
         game_mode = reg_mode;
-        field = new Field();
+        field = new Field(saver);
         gui = new Gui();
         gui.x = stage.stageWidth;
         gui.y = 10;
         addChild(field);
         addChild(gui);
+        trace(saver.data.field.length);
 
 //        shared = SharedObject.getLocal("data");
 //        shared.data.time = new Date().time;

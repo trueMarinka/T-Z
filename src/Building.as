@@ -12,6 +12,7 @@ import flash.utils.Timer;
 
 // Created 24.04.2015 at 23:22
 public class Building extends Sprite{
+    public var id:int;         // позиция в массиве в sharedobject
     private var _type:String;
     private var _cost:int;
     private var _revenue:int;
@@ -19,29 +20,45 @@ public class Building extends Sprite{
     private var info:TextField = new TextField();
     private var ready_info:TextField = new TextField();
     private var timer:Timer;
-    private var ready:Boolean;
+    private var time_to_get_income:Number;
+    private var now:Date = new Date();
     private var point:Point;
+    private var ready:Boolean;
 
-    public function Building(name:String, cost:int, income:int, time:Number) {
+    public function Building(_id:int, name:String, cost:int, income:int, time:Number) {
         ready = false;
+        id = _id;
         _type = name;
         _cost = cost;
         _revenue = income;
         _revenue_time = time;
         new Graphics(name, this);
+        InfoSettings();
+        timer = new Timer(_revenue_time * 1000, 1);
+
+        if(Main.instance.saver.data.field[id]["d_time"]){
+           if(now.time > Main.instance.saver.data.field[id].d_time){
+               ready = true;
+               Signal();
+           }
+//            else{
+//               // продожать время а не начинать сначала
+//           }
+        }
+        else{
+            timer.addEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
+            timer.start();
+        }
 
         addEventListener(MouseEvent.CLICK, OnClick);
         addEventListener(MouseEvent.MOUSE_OVER, OnHover);
         addEventListener(MouseEvent.MOUSE_OUT, OnMouseOut);
 
-        InfoSettings();
-        timer = new Timer(_revenue_time * 1000, 1);
-        timer.addEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
-        timer.start();
-
-
-
+        time_to_get_income = now.time + _revenue_time * 1000;   // если время на сбор в секундах то * на 1000, в мин - на 60000 и т.д.
+        //time_to_get_income = now.time + 120000;   //2 min
+        Main.instance.saver.data.field[id].d_time = time_to_get_income;
     }
+
     private function InfoSettings():void{
         info.width = ready_info.width = 55;
         info.height = ready_info.height = 20;
@@ -58,29 +75,16 @@ public class Building extends Sprite{
         info.visible = ready_info.visible = false;
         addChild(ready_info);
         addChild(info);
-        trace(info.width);
     }
 
-    private function ToGetIncome(event:MouseEvent):void {
-        if(ready){
-            timer.start();
-            ready = false;
-            Main.instance._coins += _revenue;
-            Main.instance.gui.money.count.text = Main.instance._coins;
-            ready_info.visible = false;
-        }
-        removeEventListener(MouseEvent.CLICK,ToGetIncome);
-    }
 
     private function OnTimerComplete(event:TimerEvent):void {
         ready = true;
         Signal();
-        addEventListener(MouseEvent.CLICK, ToGetIncome);
     }
 
     private function OnHover(event:MouseEvent):void {
         ShowInfo();
-
     }
 
     private function OnClick(event:MouseEvent):void {
@@ -92,10 +96,13 @@ public class Building extends Sprite{
 
                 break;
             case Main.instance.buy_mode:
-
+                break;
+            default:
+                if(ready){
+                   GetIncome();
+                }
                 break;
         }
-
     }
 
     private function Sell():void {
@@ -108,6 +115,16 @@ public class Building extends Sprite{
 
     private function ShowInfo():void{
         info.visible = true;
+    }
+
+    private function GetIncome():void{
+        timer.start();
+        Main.instance._coins += _revenue;
+        Main.instance.gui.money.count.text = Main.instance._coins;
+        time_to_get_income = now.time + _revenue_time * 1000;
+        //time_to_get_income = now.time + 120000;
+        Main.instance.saver.data.field[id].d_time = time_to_get_income;
+        ready_info.visible = false;
     }
 
     private function Signal():void{         //   ф-я  сигнализирующая что можно получить деньги
@@ -125,19 +142,6 @@ public class Building extends Sprite{
         timer.removeEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
     }
 
-
-//    public function get type():String{
-//        return _type;
-//    }
-//
-//
-//    public function get revenue():Number{
-//        return _revenue;
-//    }
-//
-//    public function get revenue_time():Number{
-//        return _revenue_time;
-//    }
 
     public function add_graphics(graphics:MovieClip):void {
         addChild(graphics);
