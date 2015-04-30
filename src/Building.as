@@ -13,6 +13,8 @@ import flash.utils.Timer;
 // Created 24.04.2015 at 23:22
 public class Building extends Sprite{
     public var id:int;         // позиция в массиве в sharedobject
+    public var _row:int;
+    public var _col:int;
     private var _type:String;
     private var _cost:int;
     private var _revenue:int;
@@ -20,12 +22,15 @@ public class Building extends Sprite{
     private var info:TextField = new TextField();
     private var ready_info:TextField = new TextField();
     private var timer:Timer;
+    private var tmp_timer:Timer;            // таймер для отсчитывания оставшегося времени до получения инкома
     private var time_to_get_income:Number;
     private var now:Date = new Date();
     private var point:Point;
     private var ready:Boolean;
 
-    public function Building(_id:int, name:String, cost:int, income:int, time:Number) {
+    public function Building(_id:int, name:String, cost:int, income:int, time:Number, row:int, col:int) {
+        _row = row;
+        _col = col;
         ready = false;
         id = _id;
         _type = name;
@@ -34,29 +39,40 @@ public class Building extends Sprite{
         _revenue_time = time;
         new Graphics(name, this);
         InfoSettings();
-        timer = new Timer(_revenue_time * 1000, 1);
-
-        if(Main.instance.saver.data.field[id]["d_time"]){
-           if(now.time > Main.instance.saver.data.field[id].d_time){
-               ready = true;
-               Signal();
-           }
-//            else{
-//               // продожать время а не начинать сначала
-//           }
-        }
-        else{
-            timer.addEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
-            timer.start();
-        }
+       // timer = new Timer(_revenue_time * 1000, 1);
+        timer = new Timer(120000, 1);
+        timer.addEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
 
         addEventListener(MouseEvent.CLICK, OnClick);
         addEventListener(MouseEvent.MOUSE_OVER, OnHover);
         addEventListener(MouseEvent.MOUSE_OUT, OnMouseOut);
+        addEventListener(MouseEvent.MOUSE_DOWN, OnMDown);
 
-        time_to_get_income = now.time + _revenue_time * 1000;   // если время на сбор в секундах то * на 1000, в мин - на 60000 и т.д.
-        //time_to_get_income = now.time + 120000;   //2 min
-        Main.instance.saver.data.field[id].d_time = time_to_get_income;
+        if(Main.instance.saver.data.field[id]["d_time"]){
+            if(now.time >= Main.instance.saver.data.field[id].d_time){
+                ready = true;
+                Signal();
+            }
+            else{
+                var rest_time:Number = Main.instance.saver.data.field[id].d_time - now.time;
+                tmp_timer = new Timer(rest_time, 1);
+                tmp_timer.addEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
+                tmp_timer.start();
+            }
+        }
+        else{
+            timer.start();
+            //time_to_get_income = now.time + _revenue_time * 1000;   // если время на сбор в секундах то * на 1000, в мин - на 60000 и т.д.
+            time_to_get_income = now.time + 120000;   //1 min
+            Main.instance.saver.data.field[id].d_time = time_to_get_income;
+        }
+
+
+    }
+
+    private function OnMDown(event:MouseEvent):void {
+        startDrag();
+        addEventListener(MouseEvent.MOUSE_UP, OnMUp);
     }
 
     private function InfoSettings():void{
@@ -92,11 +108,6 @@ public class Building extends Sprite{
             case Main.instance.sell_mode:
                 Sell();
                 break;
-            case Main.instance.move_mode:
-
-                break;
-            case Main.instance.buy_mode:
-                break;
             default:
                 if(ready){
                    GetIncome();
@@ -105,8 +116,16 @@ public class Building extends Sprite{
         }
     }
 
+    private function Relocate():void{
+        // изменить координаты здания
+    }
+
+    private function OnMUp(event:MouseEvent):void {
+       Relocate();
+    }
+
     private function Sell():void {
-        Main.instance.field.Remove();
+        Main.instance.field.Remove(this);
     }
 
     private function OnMouseOut(event:MouseEvent):void {
@@ -121,8 +140,9 @@ public class Building extends Sprite{
         timer.start();
         Main.instance._coins += _revenue;
         Main.instance.gui.money.count.text = Main.instance._coins;
-        time_to_get_income = now.time + _revenue_time * 1000;
-        //time_to_get_income = now.time + 120000;
+        Main.instance.saver.data.coins = Main.instance._coins;
+        //time_to_get_income = now.time + _revenue_time * 1000;
+        time_to_get_income = now.time + 120000;
         Main.instance.saver.data.field[id].d_time = time_to_get_income;
         ready_info.visible = false;
     }
@@ -136,14 +156,19 @@ public class Building extends Sprite{
     }
 
     public function RemoveListeners():void{
+        removeEventListener(MouseEvent.MOUSE_DOWN, OnMDown);
         removeEventListener(MouseEvent.MOUSE_OVER, OnHover);
         removeEventListener(MouseEvent.CLICK, OnClick);
         removeEventListener(MouseEvent.MOUSE_OUT, OnMouseOut);
         timer.removeEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
+        if(tmp_timer && tmp_timer.hasEventListener(TimerEvent.TIMER_COMPLETE)){
+            tmp_timer.removeEventListener(TimerEvent.TIMER_COMPLETE, OnTimerComplete);
+        }
     }
 
-
-    public function add_graphics(graphics:MovieClip):void {
+    public function Add_graphics(graphics:MovieClip, name:String):void {
+        graphics.x = 15;
+        graphics.y = -15;
         addChild(graphics);
     }
 

@@ -1,5 +1,6 @@
 package {
 import flash.display.MovieClip;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
@@ -10,6 +11,9 @@ public class Gui extends MovieClip {
     public var sell:MovieClip;
     public var move:MovieClip;
     public var can_remove:Boolean;
+    public var buy_panel:Buy_Panel;
+    public var maska:Sprite;
+    private var is_pressed:Boolean = false;
 
     public function Gui() {
         super();
@@ -17,15 +21,15 @@ public class Gui extends MovieClip {
         move.selection.visible = false;
         sell.selection.visible = false;
         money.count.text = Main.instance._coins;
-        // не забыть поснимать слушатели
         buy.addEventListener(MouseEvent.CLICK, OnBuyClick);
         sell.addEventListener(MouseEvent.CLICK, OnSellClick);
         move.addEventListener(MouseEvent.CLICK, OnMoveClick);
-
-
     }
 
     private function OnMoveClick(event:MouseEvent):void {
+        CancelSelections(sell);
+        CancelSelections(buy);
+        Main.instance.field.ShowGrid();
         move.selection.visible = true;
         Main.instance.game_mode = Main.instance.move_mode;
         move.removeEventListener(MouseEvent.CLICK, OnMoveClick);
@@ -36,10 +40,14 @@ public class Gui extends MovieClip {
         move.selection.visible = false;
         move.removeEventListener(MouseEvent.CLICK, StopMoving);
         move.addEventListener(MouseEvent.CLICK, OnMoveClick);
+        Main.instance.field.HideGrid();
         Main.instance.game_mode = Main.instance.reg_mode;
     }
 
     private function OnSellClick(event:MouseEvent):void {
+        CancelSelections(move);
+        CancelSelections(buy);
+        Main.instance.field.ShowGrid();
         Main.instance.game_mode = Main.instance.sell_mode;
         sell.selection.visible = true;
         sell.removeEventListener(MouseEvent.CLICK, OnSellClick);
@@ -51,12 +59,32 @@ public class Gui extends MovieClip {
         sell.selection.visible = false;
         sell.removeEventListener(MouseEvent.CLICK, StopSelling);
         sell.addEventListener(MouseEvent.CLICK, OnSellClick);
+        Main.instance.field.HideGrid();
     }
 
     private function OnBuyClick(event:MouseEvent):void {
+        CancelSelections(sell);
+        CancelSelections(move);
+        Main.instance.field.ShowGrid();
         Main.instance.game_mode = Main.instance.buy_mode;
         buy.selection.visible = true;
-        // TO DO показать варианты
+        buy_panel = new Buy_Panel();
+        Main.instance.addChildAt(buy_panel, 3);
+        buy.removeEventListener(MouseEvent.CLICK, OnBuyClick);
+        buy.addEventListener(MouseEvent.CLICK, StopBuying);
+    }
+
+    public function StopBuying(event:MouseEvent):void{
+        Main.instance.game_mode = Main.instance.reg_mode;
+        buy.selection.visible = false;
+        Main.instance.field.HideGrid();
+        buy.addEventListener(MouseEvent.CLICK, OnBuyClick);
+    }
+
+    public function CancelSelections(btn:MovieClip){
+        if(btn.selection.visible){
+            btn.selection.visible = false;
+        }
     }
 }
 }

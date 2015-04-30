@@ -17,7 +17,7 @@ public class Graphics extends Loader {
 
         if(images[img]){
             var newContent:MovieClip = new images[img]();
-            obj.addChild(newContent);
+            obj.Add_graphics(newContent, img);
         }
         else if(waiting_objects[img]){
             waiting_objects[img].push(obj);
@@ -36,7 +36,7 @@ public class Graphics extends Loader {
         images[img] = contentLoaderInfo.applicationDomain.getDefinition(img) as Class;
         for (var i:int = 0; i < waiting_objects[img].length; i++){
             var newContent:MovieClip = new images[img]();
-            waiting_objects[img][i].add_graphics(newContent);
+            waiting_objects[img][i].Add_graphics(newContent, img);
         }
         waiting_objects[img] = null;
     }

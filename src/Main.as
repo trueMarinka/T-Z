@@ -1,11 +1,20 @@
 package {
 
 import flash.display.Sprite;
+import flash.display.Stage;
 import flash.events.Event;
 import flash.net.SharedObject;
 
 [SWF(width="800",height="480",frameRate="30")]
 public class Main extends Sprite {
+    private static var _stage:Stage;
+    public static function get stage():Stage {
+        return _stage;
+    }
+
+    public var items:Object = {workshop: {cost:20, income:10, time:5},
+        complex: {cost:30, income:20, time:15}
+    };
     public var saver:SharedObject;
     public var id:int;
     private static var _instance:Main;
@@ -15,6 +24,7 @@ public class Main extends Sprite {
     public var sell_mode:String = "sell";
     public var buy_mode:String = "buy";
     public var reg_mode:String = "regular";
+    public var drag_mode:String = "drag";
     public var game_mode:String;
 
     public static function get instance():Main {
@@ -29,13 +39,15 @@ public class Main extends Sprite {
     public function Main() {
         saver = SharedObject.getLocal("Data");
         //saver.clear();
-        if(!saver.data.coins){                      // если первый запуск
+        if(!saver.data.id){                      // если первый запуск
             _coins = 1000;
             saver.data.coins = _coins;
             saver.data.field = {};
             id = 1;
+            saver.data.id = id;
         }
         else{
+            id = saver.data.id;
             _coins = saver.data.coins;
         }
         _instance = this;
@@ -46,14 +58,7 @@ public class Main extends Sprite {
         gui.y = 10;
         addChild(field);
         addChild(gui);
-        trace(saver.data.field.length);
-
-//        shared = SharedObject.getLocal("data");
-//        shared.data.time = new Date().time;
-        //trace(shared.data.time);
-
-
-
+        trace(game_mode);
 
     }
 
