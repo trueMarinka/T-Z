@@ -10,10 +10,7 @@ public class Gui extends MovieClip {
     public var buy:MovieClip;
     public var sell:MovieClip;
     public var move:MovieClip;
-    public var can_remove:Boolean;
     public var buy_panel:Buy_Panel;
-    public var maska:Sprite;
-    private var is_pressed:Boolean = false;
 
     public function Gui() {
         super();
@@ -81,7 +78,7 @@ public class Gui extends MovieClip {
         buy.addEventListener(MouseEvent.CLICK, OnBuyClick);
     }
 
-    public function CancelSelections(btn:MovieClip){
+    public function CancelSelections(btn:MovieClip):void{
         if(btn.selection.visible){
             btn.selection.visible = false;
         }

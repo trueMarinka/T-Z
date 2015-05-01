@@ -8,16 +8,13 @@ import flash.net.SharedObject;
 
 // Created 25.04.2015 at 0:20
 public class Field extends Sprite{
-    private const workshop_pos_x:int = 7;
-    private const workshop_pos_y:int = -10;
-    private const complex_pos_x:int = 20;
-    private const complex_pos_y:int = -20;
-
-    public const cell_size = 50;
-    const grid_row:int = 9;
-    const grid_col:int = 9;
+    public const cell_size:int = 50;
+    private const grid_row:int = 9;
+    private const grid_col:int = 9;
     private var grid:Array = [];
     public var grid_container:MovieClip = new MovieClip();
+    public var new_build:String;
+    public var build_for_relocate:Building;
 
     public function Field(obj:SharedObject) {
         new Graphics("field", this);
@@ -34,22 +31,22 @@ public class Field extends Sprite{
             }
         }
 
-//        Add(true, Main.instance.id, "complex", 0, 0);
-//        Add(true, Main.instance.id, "workshop", 0, 1);
-//        Add(true, Main.instance.id, "workshop", 0, 2);
-//        Add(true, Main.instance.id, "complex", 1, 0);
-//        Add(true, Main.instance.id, "workshop", 1, 1);
-//        Add(true, Main.instance.id, "workshop", 1, 2);
-//        Add(true, Main.instance.id, "complex", 2, 0);
-//        Add(true, Main.instance.id, "workshop", 2, 1);
-//        Add(true, Main.instance.id, "workshop", 2, 2);
-
         addEventListener(MouseEvent.MOUSE_DOWN, StartDragging);
         addEventListener(MouseEvent.MOUSE_UP, StopDragging);
 
     }
 
-    public function ShowGrid(){
+    public function RelocateBuilding(id:int, new_row:int, new_col:int):void{
+        if(Main.instance.saver.data.field[id]){
+            grid[build_for_relocate._row][build_for_relocate._col].removeChild(build_for_relocate);
+            grid[new_row][new_col].AddBuilding(build_for_relocate);
+            Main.instance.saver.data.field[id].y = new_row;
+            Main.instance.saver.data.field[id].x = new_col;
+            build_for_relocate = null;
+        }
+    }
+
+    public function ShowGrid():void{
         for(var i:int = 0; i < grid_row; i++){
             for(var k:int = 0; k < grid_col; k++){
                grid[i][k].draw();
@@ -57,7 +54,7 @@ public class Field extends Sprite{
         }
     }
 
-    public function HideGrid(){
+    public function HideGrid():void{
         for(var i:int = 0; i < grid_row; i++){
             for(var k:int = 0; k < grid_col; k++){
                 grid[i][k].graphics.clear();
@@ -91,16 +88,16 @@ public class Field extends Sprite{
     public function Remove(obj:Building):void{
         Main.instance._coins += obj.cost/2;
         Main.instance.gui.money.count.text = Main.instance._coins;
-        delete(Main.instance.saver.data.field[obj.id]);      // удал€ю объект из массива в shared
+        delete(Main.instance.saver.data.field[obj._id]);      // удал€ю объект из массива в shared
         obj.RemoveListeners();
         grid[obj._row][obj._col].removeChild(obj);           // удал€ю здание из €чейки
 
     }
 
     public function Add(is_new:Boolean, id:int, name:String, row:int, col:int):void{    // is_new - флаг, загружаем ли мы из shared или покупаем новый объект
-        var cost:int = Main.instance.items[name].cost;
-        var revenue:int = Main.instance.items[name].income;
-        var time_for_income:Number = Main.instance.items[name].time;
+        var cost:int = Main.ITEMS[name].cost;
+        var revenue:int = Main.ITEMS[name].income;
+        var time_for_income:Number = Main.ITEMS[name].time;
 
         // проверка что место не зан€то
         var cell:Cell = grid[row][col];
@@ -115,16 +112,6 @@ public class Field extends Sprite{
             } else {
                 object = new Building(id, name, cost, revenue, time_for_income, row, col);
             }
-//            switch (name){
-//                case "workshop":
-//                    object.x = workshop_pos_x;
-//                    object.y = workshop_pos_y;
-//                    break;
-//                case "complex":
-//                    object.x = complex_pos_x;
-//                    object.y = complex_pos_y;
-//                    break;
-//            }
             cell.AddBuilding(object);
         }
     }

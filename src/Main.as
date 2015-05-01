@@ -12,8 +12,9 @@ public class Main extends Sprite {
         return _stage;
     }
 
-    public var items:Object = {workshop: {cost:20, income:10, time:5},
-        complex: {cost:30, income:20, time:15}
+    public static const ITEMS:Object = {
+        workshop: {cost:20, income:10, time:5, pos_x: 2, pos_y: -12},
+        complex: {cost:30, income:20, time:15, pos_x: 2, pos_y: -32}
     };
     public var saver:SharedObject;
     public var id:int;
@@ -24,7 +25,6 @@ public class Main extends Sprite {
     public var sell_mode:String = "sell";
     public var buy_mode:String = "buy";
     public var reg_mode:String = "regular";
-    public var drag_mode:String = "drag";
     public var game_mode:String;
 
     public static function get instance():Main {
@@ -38,7 +38,6 @@ public class Main extends Sprite {
 
     public function Main() {
         saver = SharedObject.getLocal("Data");
-        //saver.clear();
         if(!saver.data.id){                      // если первый запуск
             _coins = 1000;
             saver.data.coins = _coins;
@@ -58,8 +57,6 @@ public class Main extends Sprite {
         gui.y = 10;
         addChild(field);
         addChild(gui);
-        trace(game_mode);
-
     }
 
 

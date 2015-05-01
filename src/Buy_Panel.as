@@ -8,7 +8,6 @@ import flash.events.MouseEvent;
 public class Buy_Panel extends Sprite{
     public var workshop_wind:MovieClip;
     public var complex_wind:MovieClip;
-    public var new_buiding:String;
     private var maska:Sprite;
 
     public function Buy_Panel() {
@@ -21,8 +20,8 @@ public class Buy_Panel extends Sprite{
 
         x = Main.instance.stage.stageWidth/2 - width/2;
         y = Main.instance.stage.stageHeight/2 - height/2;
-        workshop_wind.cost.text = Main.instance.items.workshop.cost;
-        complex_wind.cost.text = Main.instance.items.complex.cost;
+        workshop_wind.cost.text = Main.ITEMS.workshop.cost;
+        complex_wind.cost.text = Main.ITEMS.complex.cost;
         new Graphics("workshop", this);
         new Graphics("complex", this);
 
@@ -36,32 +35,18 @@ public class Buy_Panel extends Sprite{
     }
 
     private function OnClick(event:MouseEvent):void {
-        var cost:int;
         switch (event.target.parent.name){
             case "workshop_wind":
-                cost = Main.instance.items.workshop.cost;
-                    new_buiding = "workshop";
+                    Main.instance.field.new_build = "workshop";
                 break;
             case "complex_wind":
-                cost = Main.instance.items.complex.cost;
-                new_buiding = "complex";
+                Main.instance.field.new_build= "complex";
                 break;
         }
 
-        if(Main.instance._coins >= cost){
-            Buy(cost);
-
-            // ждать пока выберут куда поставят вызываем какую-то ф-ю
-        }
         DestroyMe();
     }
 
-
-    private function Buy(cost:int):void{
-        Main.instance._coins -= cost;
-        Main.instance.gui.money.count.text = Main.instance._coins;
-        Main.instance.saver.data.coins = Main.instance._coins;
-    }
 
     private function DestroyMe():void{
         Main.instance.removeChildAt(2);                 // удаляем маску
@@ -70,7 +55,7 @@ public class Buy_Panel extends Sprite{
         Main.instance.removeChild(this);
     }
 
-    public function Add_graphics(graphics:MovieClip, name:String){
+    public function Add_graphics(graphics:MovieClip, name:String):void {
         graphics.x = graphics.width/2;
         graphics.y = graphics.height/2;
         switch (name){

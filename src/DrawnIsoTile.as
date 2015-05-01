@@ -29,30 +29,5 @@ public class DrawnIsoTile extends IsoObject
         graphics.lineTo(-size, 0);
     }
 
-//    /**
-//     * Сеттер/геттер высоты этого объекта. Не используется в этом классе, но может использоваться в подклассах.
-//     */
-//    override public function set height(value:Number):void
-//    {
-//        _height = value;
-//        draw();
-//    }
-//    override public function get height():Number
-//    {
-//        return _height;
-//    }
-//
-//    /**
-//     * Сеттер/геттер цвета этой плитки.
-//     */
-//    public function set color(value:uint):void
-//    {
-//        _color = value;
-//        draw();
-//    }
-//    public function get color():uint
-//    {
-//        return _color;
-//    }
 }
 }
