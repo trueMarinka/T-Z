@@ -9,9 +9,10 @@ public class Cell extends DrawnIsoTile{
     private var _row:int;
     private var _col:int;
     private var _highlighting:Sprite;
+    public const cell_size:int = 50;
 
     public function Cell (row:int, col:int) {
-        super(Main.instance.field.cell_size,0xcccccc);
+        super(cell_size,0xcccccc);
         graphics.clear();
         _row = row;
         _col = col;
@@ -47,7 +48,7 @@ public class Cell extends DrawnIsoTile{
                 Main.instance.gui.StopBuying(event);
                 break;
             case Main.instance.move_mode:
-                if(numChildren > 1){                // если нажали на не пустую ячейку
+                if(numChildren > 1){                // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
                     var obj:Building = getChildAt(1) as Building;
                     Main.instance.field.build_for_relocate = obj;
                 }

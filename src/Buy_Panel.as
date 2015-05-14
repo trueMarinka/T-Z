@@ -49,7 +49,7 @@ public class Buy_Panel extends Sprite{
 
 
     private function DestroyMe():void{
-        Main.instance.removeChildAt(2);                 // удаляем маску
+        Main.instance.removeChildAt(2);                 // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         workshop_wind.ok_btn.removeEventListener(MouseEvent.CLICK, OnClick);
         complex_wind.ok_btn.removeEventListener(MouseEvent.CLICK, OnClick);
         Main.instance.removeChild(this);

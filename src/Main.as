@@ -38,7 +38,7 @@ public class Main extends Sprite {
 
     public function Main() {
         saver = SharedObject.getLocal("Data");
-        if(!saver.data.id){                      // если первый запуск
+        if(!saver.data.id){                      // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             _coins = 1000;
             saver.data.coins = _coins;
             saver.data.field = {};

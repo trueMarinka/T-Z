@@ -8,7 +8,7 @@ import flash.net.SharedObject;
 
 // Created 25.04.2015 at 0:20
 public class Field extends Sprite{
-    public const cell_size:int = 50;
+    //public const cell_size:int = 50;
     private const grid_row:int = 9;
     private const grid_col:int = 9;
     private var grid:Array = [];
@@ -78,7 +78,7 @@ public class Field extends Sprite{
             grid[i] = [];
             for(var k:int = 0; k < grid_col; k++){
                 cell = new Cell(i, k);
-                cell.position = new Point3D(i * cell_size, 0, k * cell_size);
+                cell.position = new Point3D(i * cell.cell_size, 0, k * cell.cell_size);
                 grid[i].push(cell);
                 grid_container.addChild(cell);
             }
@@ -88,24 +88,24 @@ public class Field extends Sprite{
     public function Remove(obj:Building):void{
         Main.instance._coins += obj.cost/2;
         Main.instance.gui.money.count.text = Main.instance._coins;
-        delete(Main.instance.saver.data.field[obj._id]);      // удаляю объект из массива в shared
+        delete(Main.instance.saver.data.field[obj._id]);      // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ shared
         obj.RemoveListeners();
-        grid[obj._row][obj._col].removeChild(obj);           // удаляю здание из ячейки
+        grid[obj._row][obj._col].removeChild(obj);           // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
     }
 
-    public function Add(is_new:Boolean, id:int, name:String, row:int, col:int):void{    // is_new - флаг, загружаем ли мы из shared или покупаем новый объект
+    public function Add(is_new:Boolean, id:int, name:String, row:int, col:int):void{    // is_new - пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅ shared пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         var cost:int = Main.ITEMS[name].cost;
         var revenue:int = Main.ITEMS[name].income;
         var time_for_income:Number = Main.ITEMS[name].time;
 
-        // проверка что место не занято
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         var cell:Cell = grid[row][col];
         if(cell.numChildren == 1){
             var object:Building;
             if(is_new){
                 Main.instance.saver.data.field[Main.instance.saver.data.id] = {name:name, x:col, y:row};
-                object = new Building(Main.instance.id, name, cost, revenue, time_for_income, row, col); // если новое - создаю с новым ID
+                object = new Building(Main.instance.id, name, cost, revenue, time_for_income, row, col); // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ ID
                 cell.addChild(object);
                 Main.instance.id++;
                 Main.instance.saver.data.id = Main.instance.id;
