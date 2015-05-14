@@ -15,7 +15,6 @@ public class Field extends Sprite{
     public var grid_container:MovieClip = new MovieClip();
     public var new_build:String;
     public var build_for_relocate:Building;
-    private var test2:int;
     public function Field(obj:SharedObject) {
         new Graphics("field", this);
         SetGrid();
